@@ -14,6 +14,9 @@ var (
 	// ErrTokenRevoked represents 400 Token Revoked errors
 	ErrTokenRevoked = errors.New("TOKEN_REVOKED")
 
+	// ErrGroupNotFound respesnts a 404 Not Found errors for groups
+	ErrGroupNotFound = errors.New("GROUP_NOT_FOUND")
+
 	// ErrRateLimitExceeded represents 429 Rate Limit Exceeded errors
 	ErrRateLimitExceeded = errors.New("RATE_LIMIT_EXCEEDED")
 
@@ -25,8 +28,12 @@ var (
 )
 
 const (
+	// AzureProviderName identifies the Azure AD v2 provider
+	AzureProviderName = "azure_v2"
 	// GoogleProviderName identifies the Google provider
 	GoogleProviderName = "google"
+	// OIDCProviderName identifies the OpenID Connect provider
+	OIDCProviderName = "oidc"
 )
 
 // Provider is an interface exposing functions necessary to authenticate with a given provider.

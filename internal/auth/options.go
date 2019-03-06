@@ -63,8 +63,10 @@ type Options struct {
 	EmailDomains     []string `envconfig:"SSO_EMAIL_DOMAIN"`
 	ProxyRootDomains []string `envconfig:"PROXY_ROOT_DOMAIN"`
 
+	AzureTenant              string `envconfig:"AZURE_TENANT"`
 	GoogleAdminEmail         string `envconfig:"GOOGLE_ADMIN_EMAIL"`
 	GoogleServiceAccountJSON string `envconfig:"GOOGLE_SERVICE_ACCOUNT_JSON"`
+	OIDCDiscoveryURL         string `envconfig:"OIDC_DISCOVERY_URL"`
 
 	Footer string `envconfig:"FOOTER"`
 
@@ -260,7 +262,20 @@ func newProvider(o *Options) (providers.Provider, error) {
 
 	var singleFlightProvider providers.Provider
 	switch o.Provider {
-	case providers.GoogleProviderName: // Google
+	case providers.AzureProviderName:
+		azureProvider, err := providers.NewAzureV2Provider(p)
+		if err != nil {
+			return nil, err
+		}
+		azureProvider.Configure(o.AzureTenant)
+		singleFlightProvider = providers.NewSingleFlightProvider(azureProvider)
+	case providers.OIDCProviderName:
+		oidcProvider, err := providers.NewOIDCProvider(p, o.OIDCDiscoveryURL)
+		if err != nil {
+			return nil, err
+		}
+		singleFlightProvider = providers.NewSingleFlightProvider(oidcProvider)
+	case providers.GoogleProviderName:
 		if o.GoogleServiceAccountJSON != "" {
 			_, err := os.Open(o.GoogleServiceAccountJSON)
 			if err != nil {
@@ -308,6 +323,8 @@ func AssignStatsdClient(opts *Options) func(*Authenticator) error {
 
 		proxy.StatsdClient = StatsdClient
 		switch v := proxy.provider.(type) {
+		case *providers.AzureV2Provider:
+			v.SetStatsdClient(StatsdClient)
 		case *providers.GoogleProvider:
 			v.SetStatsdClient(StatsdClient)
 		case *providers.SingleFlightProvider:
