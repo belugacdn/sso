@@ -107,9 +107,10 @@ func (p *AzureV2Provider) Redeem(redirectURL, code string) (*sessions.SessionSta
 
 	// Extract custom claims.
 	var claims struct {
-		Email string `json:"email"`
-		UPN   string `json:"upn"`
-		Nonce string `json:"nonce"`
+		Email             string `json:"email"`
+		UPN               string `json:"upn"`
+		Nonce             string `json:"nonce"`
+		PreferredUsername string `json:"preferred_username"`
 	}
 	if err := idToken.Claims(&claims); err != nil {
 		return nil, fmt.Errorf("failed to parse id_token claims: %v", err)
@@ -138,15 +139,13 @@ func (p *AzureV2Provider) Redeem(redirectURL, code string) (*sessions.SessionSta
 		User:  claims.UPN,
 	}
 
-	/*
-		if p.GraphService != nil {
-			groupNames, err := p.GraphService.GetGroups(claims.Email)
-			if err != nil {
-				return nil, fmt.Errorf("could not get groups: %v", err)
-			}
-			s.Groups = groupNames
+	if p.GraphService != nil {
+		groupNames, err := p.GraphService.GetGroups(claims.PreferredUsername)
+		if err != nil {
+			return nil, fmt.Errorf("could not get groups: %v", err)
 		}
-	*/
+		s.Groups = groupNames
+	}
 
 	return s, nil
 }
