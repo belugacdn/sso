@@ -1,0 +1,34 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+PKGDIR=$(CURDIR)/debian/sso
+GO=/usr/lib/go-1.12/bin/go
+
+%:
+	dh $@ 
+
+clean:
+	dh_clean
+
+override_dh_auto_build:
+
+override_dh_auto_test:
+
+binary-arch: clean
+	dh_prep
+	dh_installdirs
+	
+	mkdir -p "$(PKGDIR)/usr/bin/"
+
+	go build -o "$(PKGDIR)/usr/bin/sso-proxy" github.com/buzzfeed/sso/cmd/sso-proxy
+	go build -o "$(PKGDIR)/usr/bin/sso-auth" github.com/buzzfeed/sso/cmd/sso-auth
+
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-arch

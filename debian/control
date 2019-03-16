@@ -1,0 +1,12 @@
+Source: sso
+Section: devel
+Priority: extra
+Maintainer: Adam Jacob Muller <adam@nurd.com>
+Build-Depends: debhelper (>= 7.0.50~), pkg-config, golang-1.12-go
+Standards-Version: 3.9.1
+Homepage: https://github.com/belugacdn/sso
+
+Package: sso
+Architecture: amd64
+Depends: 
+Description: SSO
