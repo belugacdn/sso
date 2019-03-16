@@ -20,8 +20,8 @@ binary-arch: clean
 	
 	mkdir -p "$(PKGDIR)/usr/bin/"
 
-	go build -o "$(PKGDIR)/usr/bin/sso-proxy" github.com/buzzfeed/sso/cmd/sso-proxy
-	go build -o "$(PKGDIR)/usr/bin/sso-auth" github.com/buzzfeed/sso/cmd/sso-auth
+	$(GO) build -o "$(PKGDIR)/usr/bin/sso-proxy" github.com/buzzfeed/sso/cmd/sso-proxy
+	$(GO) build -o "$(PKGDIR)/usr/bin/sso-auth" github.com/buzzfeed/sso/cmd/sso-auth
 
 	dh_strip
 	dh_compress
